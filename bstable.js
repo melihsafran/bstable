@@ -30,6 +30,7 @@ class BSTable {
       onAdd: function() {},           // Called when added a new row
       advanced: {                     // Do not override advanced unless you know what youre doing
           columnLabel: 'Actions',
+          confirmQuestion: 'Are you sure to delete this row?',
           buttonHTML: `<div class="btn-group pull-right">
                 <button id="bEdit" type="button" class="btn btn-sm btn-default">
                     <span class="fa fa-edit" > </span>
@@ -73,7 +74,7 @@ class BSTable {
     this.table.find('thead tr').append('<th name="bstable-actions">' + this.options.advanced.columnLabel + '</th>');  // Append column to header
     this.table.find('tbody tr').append(this.actionsColumnHTML);
 
-    this._addOnClickEventsToActions(); // Add onclick events to each action button in all rows
+    this._addOnClickEventsToActions(this.options.advanced.confirmQuestion); // Add onclick events to each action button in all rows
 
     // Process "addButton" parameter
     if (this.options.$addButton != null) {
@@ -167,9 +168,21 @@ class BSTable {
     });
     this._actionsModeEdit(button);
   }
-  _rowDelete(button) {                        
+  _rowDelete(button, confirmMessage) {                        
   // Remove the row
     let $currentRow = $(button).parents('tr');       // access the row
+    let $cols = $currentRow.find('td');              // read rows
+    let colValues = '';
+    $cols.each((i, c) => { 
+        if(c.innerText != ''){ 
+            colValues += c.innerText + ((i < $cols.length - 2) ? ', ' : ''); 
+        }
+    });
+
+    if(!confirm(colValues + '\n\n' + confirmMessage)){
+        return false;
+    }
+            
     this.options.onBeforeDelete($currentRow);
     $currentRow.remove();
     this.options.onDelete();
@@ -234,7 +247,7 @@ class BSTable {
         }
       });
     }
-    this._addOnClickEventsToActions(); // Add onclick events to each action button in all rows
+    this._addOnClickEventsToActions(this.options.advanced.confirmQuestion); // Add onclick events to each action button in all rows
     this.options.onAdd();
   }
 
@@ -268,11 +281,11 @@ class BSTable {
     }
   }
 
-  _addOnClickEventsToActions() {
+  _addOnClickEventsToActions(q) {
     let _this = this;
     // Add onclick events to each action button
     this.table.find('tbody tr #bEdit').each(function() {let button = this; button.onclick = function() {_this._rowEdit(button)} });
-    this.table.find('tbody tr #bDel').each(function() {let button = this; button.onclick = function() {_this._rowDelete(button)} });
+    this.table.find('tbody tr #bDel').each(function() {let button = this; button.onclick = function() {_this._rowDelete(button, q)} });
     this.table.find('tbody tr #bAcep').each(function() {let button = this; button.onclick = function() {_this._rowAccept(button)} });
     this.table.find('tbody tr #bCanc').each(function() {let button = this; button.onclick = function() {_this._rowCancel(button)} });
   }
