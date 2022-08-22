@@ -45,7 +45,8 @@ Create the BSTable with examples of setting common options
         // use 'row' element to access the columns.
       },
       advanced: {                         
-          columnLabel: ''                 // Set the column label to have no text
+          columnLabel: '',                 // Set the column label to have no text
+          confirmQuestion: 'Are you sure to delete this row?', // Set to change default confirm question
       }
     });
     editableTable.init();
@@ -65,6 +66,7 @@ Refresh the table (Call if the table dynamically updates)
             
             advanced: {                     // Do not override advanced unless you know what youre doing
                 columnLabel: 'Actions',
+                confirmQuestion: 'Are you sure?',
                 buttonHTML: `<div class="btn-group pull-right">
                         <button id="bEdit" type="button" class="btn btn-sm btn-default" onclick="rowEdit(this);">
                             <span class="fa fa-edit" > </span>
